@@ -22,16 +22,19 @@ class Car(Object):
         self.accel = 0
 
     def left(self):
-        self.accel = -1 * self.setAccel
+        # self.accel = -1 * self.setAccel
+        self.speed = -self.setAccel
 
     def right(self):
-        self.accel = self.setAccel
+        # self.accel = self.setAccel
+        self.speed = self.setAccel
 
     def stop(self):
-        self.accel = 0
+        # self.accel = 0
+        self.speed = 0
 
     def update(self):
-        self.speed += self.accel - self.Fc * self.speed
+        # self.speed += self.accel - self.Fc * self.speed
         self.x += self.speed
 
 
@@ -62,8 +65,11 @@ class Game:
     MAX_CELLS = floor(ROAD * WIDTH / ObjSize)
     CELL_WIDTH = floor(ROAD * WIDTH / MAX_CELLS)
     MAX_ROW_CELLS = floor(CELL_OPEN_PCT * MAX_CELLS)
+    FRAMERATE = 60
+    MINSEC = 0.7
+    MAXSEC = 1.5
 
-    score = 0
+    score = 1000
     spawn_speed = 5
     obstacles = []
     index = 0
@@ -71,10 +77,11 @@ class Game:
     def __init__(self):
         CAR_WIDTH = 30
         CAR_HEIGHT = 30
-        CAR_ACCEL = 1
+        # CAR_ACCEL = 1
+        CAR_SPEED = 5
         CAR_BRAKE = 0.1
         self.car = Car(0.5 * self.WIDTH - 0.5 * CAR_WIDTH, self.HEIGHT - 0.1 * self.HEIGHT,
-                       CAR_WIDTH, CAR_HEIGHT, CAR_ACCEL, CAR_BRAKE)
+                       CAR_WIDTH, CAR_HEIGHT, CAR_SPEED, CAR_BRAKE)
 
     def spawnRow(self):
         cells = randint(1, self.MAX_ROW_CELLS)
@@ -104,7 +111,7 @@ class Game:
                             break
         if hit:
             self.obstacles = []
-            self.score -= 50
+            self.score -= 20
         else:
             for o in removals:
                 self.obstacles.remove(o)
@@ -122,6 +129,13 @@ class Game:
 
         self.index += 1
         # 60 frames per second, new row every 0.5 seconds to 1.5 seconds; controls allowed response time
-        if self.index > randint(30, 90):
+        if self.index > randint(floor(self.MINSEC*self.FRAMERATE), floor(self.MINSEC*self.FRAMERATE)):
             self.spawnRow()
             self.index = 0
+
+        if self.score < 1:
+            self.score = 0
+            return -1
+        if self.score > 1999:
+            return 1
+        return 0
