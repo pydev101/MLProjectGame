@@ -4,9 +4,8 @@ random.seed(time.time())
 
 
 class Neuron:
-    weights = []
-
     def __init__(self, numOfInputs, learningRate, activation):
+        self.weights = []
         for n in range(0, numOfInputs):
             self.weights.append(random.random())
         self.bias = random.random()
@@ -41,9 +40,8 @@ class Neuron:
 
 
 class Layer:
-    neurons = []
-
     def __init__(self, numOfInputs, numOfNeurons, learningRate, activation):
+        self.neurons = []
         for _ in range(0, numOfNeurons):
             self.neurons.append(Neuron(numOfInputs, learningRate, activation))
 
@@ -59,10 +57,9 @@ class Layer:
 
 
 class DNN:
-    layers = []
-    temp = []
-
     def __init__(self, inputs, design, learningRate, activation):
+        self.layers = []
+        self.temp = []
         self.layers.append(Layer(inputs, design[0], learningRate, activation))
         for i in range(1, len(design)):
             self.layers.append(Layer(design[i - 1], design[i], learningRate, activation))

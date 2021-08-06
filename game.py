@@ -71,7 +71,7 @@ class Game:
 
     score = 1000
     spawn_speed = 5
-    obstacles = []
+    rows = []
     index = 0
 
     def __init__(self):
@@ -86,35 +86,39 @@ class Game:
     def spawnRow(self):
         cells = randint(1, self.MAX_ROW_CELLS)
         usedPos = []
+        testRow = []
         for _ in range(0, cells):
             i = generateUnused(0, self.MAX_CELLS-1, usedPos)
             usedPos.append(i)
             o = Faller(self.ROAD_BOUNDS[0] + i * self.CELL_WIDTH, 0, self.ObjSize, self.ObjSize, self.spawn_speed)
-            self.obstacles.append(o)
+            testRow.append(o)
+        self.rows.append(testRow)
 
     def update(self):
         self.car.update()
-        removals = []
-        global hit
-        hit = False
-        for o in self.obstacles:
-            o.update()
-            if o.y + o.length > self.car.y:
-                if o.y > self.car.y + self.car.length:
+
+        # Update all obsticles, up score if past car, down score if hit car, update rows
+        for r in self.rows:
+            for o in r:
+                o.update()
+        if len(self.rows) > 0:
+            r = self.rows[0]
+            oi = r[0]
+            if oi.y + oi.length > self.car.y:
+                if oi.y > self.car.y + self.car.length:
+                    # Past Car
                     if (self.car.x > self.ROAD_BOUNDS[0]) and (self.car.x + self.car.width < self.ROAD_BOUNDS[1]):
-                        self.score += 3
-                    removals.append(o)
+                        self.score += 3*len(r)
+                    self.rows.pop(0)
                 else:
-                    if o.x < self.car.x + self.car.width:
-                        if o.x + o.width > self.car.x:
-                            hit = True
-                            break
-        if hit:
-            self.obstacles = []
-            self.score -= 20
-        else:
-            for o in removals:
-                self.obstacles.remove(o)
+                    # Potiental hit
+                    for o in r:
+                        if o.x < self.car.x + self.car.width:
+                            if o.x + o.width > self.car.x:
+                                # HIT
+                                self.score -= 10
+                                self.rows = []
+                                break
 
         if (self.car.x < self.ROAD_BOUNDS[0]) or (self.car.x + self.car.width > self.ROAD_BOUNDS[1]):
             self.score -= 1
@@ -134,7 +138,7 @@ class Game:
             self.index = 0
 
         if self.score < 1:
-            self.score = 0
+            # self.score = 0
             return -1
         if self.score > 1999:
             return 1
