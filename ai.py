@@ -5,10 +5,15 @@ import animation
 import time
 import random
 import grapher
+import math
 
-LEARNINGRATE = 0.1
-LEARNFRAMES = 600
+LEARNINGSCALE = 0.0001
+LEARNFRAMES = 1000
 EPSILION = 0.0
+
+
+def linear(x):
+    return x
 
 
 def sigmoid(x):
@@ -21,9 +26,9 @@ def sigmoid(x):
 
 game = Game()
 graph = grapher.Graph("test")
-dnn = DNN(3 + game.MAX_CELLS, [6, 8, 3], 1, sigmoid)
 
 action = [game.car.left, game.car.right, game.car.stop]
+dnn = DNN(2 + game.MAX_CELLS, [3, 18, 9, len(action)], linear)
 
 oldScore = game.score
 oldSum = 0
@@ -32,7 +37,6 @@ running = True
 i = 0
 t = time.time()
 runsum = 0
-oldX = game.car.x
 
 while running:
     inputs = []
@@ -42,9 +46,14 @@ while running:
         for o in game.rows[0]:
             inputs[floor((o.x - game.GRASS_WIDTH) / game.CELL_WIDTH)] = 1
         inputs.append(game.rows[0][0].y / game.HEIGHT)
-    inputs.append(game.car.x / game.WIDTH)
-    inputs.append((game.car.x - oldX) / game.WIDTH)
-    oldX = game.car.x
+    else:
+        inputs.append(0)
+    pos = floor((game.car.x - game.GRASS_WIDTH) / game.CELL_WIDTH) / game.MAX_CELLS
+    inputs.append(pos)
+
+    if len(inputs) != 2 + game.MAX_CELLS:
+        print("BAD INPUT")
+        break
 
     table = dnn.out(inputs)
     if random.random() < EPSILION:
@@ -63,15 +72,25 @@ while running:
         avgChangeOfScore = runsum / LEARNFRAMES
         graph.add(i, avgChangeOfScore)
 
-        if avgChangeOfScore <= oldSum / LEARNFRAMES:
-            dnn.train(avgChangeOfScore)
+        '''
+        if avgChangeOfScore <= LEARNINGSCALE:
+            avgChangeOfScore = LEARNINGSCALE
+        dnn.train(LEARNINGSCALE / avgChangeOfScore)
+        '''
+        if avgChangeOfScore <= 0:
+            rate = 1
+        else:
+            rate = 0.001**(0.5*avgChangeOfScore)
+        dnn.train(rate)
+
         oldSum = runsum
         runsum = 0
 
     if i % 300000 == 0:
         graph.save()
         t = time.time()
-    if (time.time() - t) < 5:
+        print("Saved", floor(i / LEARNFRAMES))
+    if (time.time() - t) < 0:
         animation.animate(game)
 
     i = i + 1

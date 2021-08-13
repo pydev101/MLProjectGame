@@ -107,7 +107,7 @@ class Game:
             if oi.y + oi.length > self.car.y:
                 if oi.y > self.car.y + self.car.length:
                     # Past Car
-                    if (self.car.x > self.ROAD_BOUNDS[0]) and (self.car.x + self.car.width < self.ROAD_BOUNDS[1]):
+                    if (self.car.x >= self.ROAD_BOUNDS[0]) and (self.car.x + self.car.width <= self.ROAD_BOUNDS[1]):
                         self.score += 3*len(r)
                     self.rows.pop(0)
                 else:
@@ -122,6 +122,14 @@ class Game:
 
         if (self.car.x < self.ROAD_BOUNDS[0]) or (self.car.x + self.car.width > self.ROAD_BOUNDS[1]):
             self.score -= 1
+        '''
+            self.car.speed = 0
+            self.car.accel = 0
+            if self.car.x < self.ROAD_BOUNDS[0]:
+                self.car.x = self.ROAD_BOUNDS[0]
+            else:
+                self.car.x = self.WIDTH - self.GRASS_WIDTH - self.car.width
+        '''
 
         if (self.car.x < 0) or (self.car.x + self.car.width > self.WIDTH):
             self.car.speed = 0

@@ -28,10 +28,21 @@ class Graph:
                 pass
 
 
+SAMPLESIZE = 5
 if __name__ == "__main__":
     import matplotlib.pyplot as plt
 
     graph = Graph("test")
     graph.read()
-    plt.plot(graph.X, graph.Y)
+    X = []
+    Y = []
+    for i in range(SAMPLESIZE, len(graph.X), SAMPLESIZE):
+        X.append(i)
+        Y.append((graph.Y[i] - graph.Y[i-SAMPLESIZE])/(graph.X[i] - graph.X[i-SAMPLESIZE]))
+    plt.plot(X, Y)
+
+    sum = 0
+    for n in Y:
+        sum += n
+    print(sum)
     plt.show()
