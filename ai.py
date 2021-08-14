@@ -90,10 +90,10 @@ while running:
             avgChangeOfScore = LEARNINGSCALE
         dnn.train(LEARNINGSCALE / avgChangeOfScore)
         '''
-        if avgChangeOfScore <= 0:
+        if avgChangeOfScore < -1:
             rate = 1
         else:
-            rate = 0.001 ** (0.5 * avgChangeOfScore)
+            rate = 0.1 ** (avgChangeOfScore + 1)
         dnn.train(rate)
 
         oldSum = runsum
