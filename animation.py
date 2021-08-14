@@ -12,8 +12,8 @@ YELLOW = 175, 175, 0
 
 pygame.display.set_caption("Racin Rodney")
 clock = pygame.time.Clock()
-carImg = pygame.image.load("./assets/car.png")
-coneImg = pygame.image.load("./assets/cone.png")
+carImg = pygame.image.load("./assets/Car.png")
+coneImg = pygame.image.load("./assets/Cone.png")
 
 
 def getRect(Obj):
