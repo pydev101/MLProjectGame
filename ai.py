@@ -22,7 +22,8 @@ if args.frames:
 if args.animate:
     ANIMATE = bool(args.animate)
 if args.new:
-    ANIMATE = bool(args.new)
+    if bool(args.new):
+        loadOld = False
 
 
 def linear(x):
