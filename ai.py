@@ -9,15 +9,20 @@ import argparse
 # LEARNINGSCALE = 0.0001
 LEARNFRAMES = 1000
 ANIMATE = False
+loadOld = True
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-f", "--frames", help="Frames used to calculate learning average")
 parser.add_argument("-a", "--animate", help="Show Animation")
+parser.add_argument("-n", "--new", help="Creates new DNN")
+
 args = parser.parse_args()
 if args.frames:
     LEARNFRAMES = int(args.frames)
 if args.animate:
     ANIMATE = bool(args.animate)
+if args.new:
+    ANIMATE = bool(args.new)
 
 
 def linear(x):
@@ -36,7 +41,6 @@ graph = grapher.Graph("test")
 
 action = [game.car.left, game.car.right, game.car.stop]
 
-loadOld = True
 if loadOld:
     dnn, globalsum, i = loadDNN()
 else:

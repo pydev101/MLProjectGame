@@ -32,7 +32,7 @@ class Neuron:
             if d == 0:
                 self.weights[i] = random.random()
             else:
-                self.weights[i] = rate * change / d
+                self.weights[i] += rate * change
         self.weightsOld = temp
 
         tempBias = self.bias
@@ -40,7 +40,7 @@ class Neuron:
         if d == 0:
             self.bias = random.random()
         else:
-            self.bias = rate * change / d
+            self.bias += rate * change
         self.oldBias = tempBias
 
 
