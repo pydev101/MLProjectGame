@@ -1,15 +1,23 @@
 from game import *
-from dnn import DNN
+from dnn import DNN, loadDNN
 from numpy import exp
 import animation
 import time
-import random
 import grapher
-import math
+import argparse
 
-LEARNINGSCALE = 0.0001
+# LEARNINGSCALE = 0.0001
 LEARNFRAMES = 1000
-EPSILION = 0.0
+ANIMATE = False
+
+parser = argparse.ArgumentParser()
+parser.add_argument("-f", "--frames", help="Frames used to calculate learning average")
+parser.add_argument("-a", "--animate", help="Show Animation")
+args = parser.parse_args()
+if args.frames:
+    LEARNFRAMES = args.frames
+if args.animate:
+    ANIMATE = args.animate
 
 
 def linear(x):
@@ -21,21 +29,28 @@ def sigmoid(x):
         return 1.0 / (1.0 + exp(-x))
     except Exception as e:
         print(x)
-        exit()
 
 
 game = Game()
 graph = grapher.Graph("test")
 
 action = [game.car.left, game.car.right, game.car.stop]
-dnn = DNN(2 + game.MAX_CELLS, [3, 18, 9, len(action)], linear)
+
+loadOld = True
+if loadOld:
+    dnn, globalsum, i = loadDNN()
+else:
+    globalsum = 0
+    dnn = DNN(2 + game.MAX_CELLS, [3, 18, 9, len(action)], linear)
+    graph.clear()
+    i = 0
 
 oldScore = game.score
 oldSum = 0
 
 running = True
-i = 0
 t = time.time()
+
 runsum = 0
 
 while running:
@@ -51,15 +66,12 @@ while running:
     pos = floor((game.car.x - game.GRASS_WIDTH) / game.CELL_WIDTH) / game.MAX_CELLS
     inputs.append(pos)
 
-    if len(inputs) != 2 + game.MAX_CELLS:
+    if len(inputs) != dnn.expectedInputs:
         print("BAD INPUT")
         break
 
     table = dnn.out(inputs)
-    if random.random() < EPSILION:
-        action[random.randint(0, 2)]()
-    else:
-        action[table.index(max(table))]()
+    action[table.index(max(table))]()
 
     failCondition = game.update()
     delta = game.score - oldScore
@@ -70,6 +82,7 @@ while running:
     runsum += delta
     if i % LEARNFRAMES == 0:
         avgChangeOfScore = runsum / LEARNFRAMES
+        globalsum = avgChangeOfScore
         graph.add(i, avgChangeOfScore)
 
         '''
@@ -80,7 +93,7 @@ while running:
         if avgChangeOfScore <= 0:
             rate = 1
         else:
-            rate = 0.001**(0.5*avgChangeOfScore)
+            rate = 0.001 ** (0.5 * avgChangeOfScore)
         dnn.train(rate)
 
         oldSum = runsum
@@ -88,9 +101,11 @@ while running:
 
     if i % 300000 == 0:
         graph.save()
+        dnn.save(globalsum, i)
         t = time.time()
-        print("Saved", floor(i / LEARNFRAMES))
-    if (time.time() - t) < 0:
+        print("Saved", floor(i / LEARNFRAMES), globalsum)
+
+    if ANIMATE:
         animation.animate(game)
 
     i = i + 1

@@ -1,4 +1,6 @@
-import random, time
+import random
+import time
+import pickle
 
 random.seed(time.time())
 
@@ -64,6 +66,7 @@ class DNN:
         self.layers = []
         self.temp = []
         self.layers.append(Layer(inputs, design[0], activation))
+        self.expectedInputs = inputs
         for i in range(1, len(design)):
             self.layers.append(Layer(design[i - 1], design[i], activation))
 
@@ -76,3 +79,14 @@ class DNN:
     def train(self, rate):
         for l in self.layers:
             l.train(rate)
+
+    def save(self, score, i):
+        a = [self, score, i]
+        with open("DNN", 'wb') as f:
+            pickle.dump(a, f)
+
+
+def loadDNN():
+    with open("DNN", 'rb') as f:
+        a = pickle.load(f)
+    return a[0], a[1], a[2]

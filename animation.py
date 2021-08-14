@@ -15,6 +15,7 @@ clock = pygame.time.Clock()
 carImg = pygame.image.load("assets/car.png")
 coneImg = pygame.image.load("assets/cone.png")
 
+
 def getRect(Obj):
     return pygame.Rect(Obj.x, Obj.y, Obj.width, Obj.length)
 

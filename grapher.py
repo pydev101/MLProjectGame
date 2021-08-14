@@ -9,9 +9,15 @@ class Graph:
         self.Y.append(y)
 
     def save(self):
-        with open(self.name + ".csv", "w") as f:
+        with open(self.name + ".csv", "a") as f:
             for i in range(0, len(self.X)):
                 f.write("{},{}\n".format(self.X[i], self.Y[i]))
+        self.X = []
+        self.Y = []
+
+    def clear(self):
+        with open(self.name + ".csv", "w") as f:
+            f.write("")
 
     def read(self):
         self.X = []
