@@ -15,9 +15,9 @@ parser.add_argument("-f", "--frames", help="Frames used to calculate learning av
 parser.add_argument("-a", "--animate", help="Show Animation")
 args = parser.parse_args()
 if args.frames:
-    LEARNFRAMES = args.frames
+    LEARNFRAMES = int(args.frames)
 if args.animate:
-    ANIMATE = args.animate
+    ANIMATE = bool(args.animate)
 
 
 def linear(x):
